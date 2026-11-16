@@ -14,6 +14,7 @@ window.SITE = {
 
   frames: {
     total: 150,
+    totalMobile: 75, // telemóvel: metade dos frames, mais leves
     desktop: "assets/frames/desktop/f_{n}.webp",
     mobile: "assets/frames/mobile/f_{n}.webp",
   },

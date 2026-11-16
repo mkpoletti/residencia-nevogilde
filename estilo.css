@@ -87,7 +87,7 @@ p { margin: 0; color: var(--suave); text-wrap: pretty; }
 
 /* Cortina de entrada */
 .cortina { position: fixed; inset: 0; z-index: 300; pointer-events: none; display: grid; place-items: center; }
-.cortina::before { content: ""; position: absolute; inset: 0; background: var(--escuro); transform-origin: top; transition: transform 1.1s var(--ease-io) .1s; }
+.cortina::before { content: ""; position: absolute; inset: 0; background: var(--escuro); transform-origin: top; transition: transform .9s var(--ease-io); }
 .cortina .marca { position: relative; color: var(--branco); transition: opacity .4s, transform 1s var(--ease); }
 .pronto .cortina::before { transform: scaleY(0); }
 .pronto .cortina .marca { opacity: 0; transform: translateY(-20px); }
@@ -300,3 +300,7 @@ input:focus, textarea:focus, select:focus { outline: none; border-color: var(--a
   .momento--1 { opacity: 1; visibility: visible; }
   .cortina { display: none; }
 }
+
+/* Desempenho: o texto do hero (LCP) entra mais cedo e sem desfoque */
+.momento--1 .sobe { filter: none; transform: translateY(16px); transition: opacity .7s var(--ease), transform .9s var(--ease); transition-delay: calc(.05s + var(--d, 0s)); }
+.momento--1.ativo .sobe.visto { transform: none; }

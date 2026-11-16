@@ -42,7 +42,7 @@
 
   /* ── Cortina de entrada / saída ─────────────────────────────────────── */
   const abrir = () => requestAnimationFrame(() => html.classList.add("pronto"));
-  if (document.readyState === "complete") abrir(); else addEventListener("load", abrir);
+  abrir(); // não espera pelas imagens: o texto do hero aparece logo
   setTimeout(abrir, 1800); // nunca prende a página
   addEventListener("pageshow", (e) => { if (e.persisted) { html.classList.remove("saindo"); html.classList.add("pronto"); } });
   /* ── Rolagem suave (Lenis, se carregou) ─────────────────────────────── */
@@ -59,14 +59,14 @@
   }), { threshold: 0.15, rootMargin: "0px 0px -6% 0px" });
   const alvos = document.querySelectorAll(".split, .sobe, .revela");
   const iniciar = () => alvos.forEach((el) => (el.closest(".momento") ? el.classList.add("visto") : io.observe(el)));
-  setTimeout(iniciar, reduzir ? 0 : 450);
+  setTimeout(iniciar, reduzir ? 0 : 150);
 
   /* ── Hero: o vídeo anda com a rolagem ───────────────────────────────── */
   const cine = document.querySelector(".cine");
   const canvas = cine && cine.querySelector("canvas");
   if (cine && canvas && S.frames && S.frames.total) {
     const ctx = canvas.getContext("2d");
-    const total = S.frames.total;
+    const total = celular ? (S.frames.totalMobile || S.frames.total) : S.frames.total;
     const padrao = celular ? S.frames.mobile : S.frames.desktop;
     const src = (i) => padrao.replace("{n}", String(i + 1).padStart(4, "0"));
     const quadros = new Array(total);
@@ -80,13 +80,17 @@
       return (quadros[i] = img);
     };
     carregar(0);
-    if (!reduzir) {
+    const iniciarFila = () => {
+      if (reduzir) return;
       const fila = [];
       for (const passo of [8, 4, 2, 1]) for (let i = 0; i < total; i += passo) if (!fila.includes(i)) fila.push(i);
       let k = 0;
       const lote = () => { for (let n = 0; n < 6 && k < fila.length; n++) carregar(fila[k++]); if (k < fila.length) setTimeout(lote, 40); };
       lote();
-    }
+    };
+    // os restantes frames só descarregam depois de a página estar carregada
+    if (document.readyState === "complete") setTimeout(iniciarFila, 300);
+    else addEventListener("load", () => setTimeout(iniciarFila, 300));
     const pronto = (i) => quadros[i] && quadros[i].complete && quadros[i].naturalWidth;
     const maisProximo = (i) => { for (let d = 0; d < total; d++) { if (pronto(i - d)) return i - d; if (pronto(i + d)) return i + d; } return -1; };
     function desenhar(i, forcar) {
